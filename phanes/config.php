@@ -1,13 +1,14 @@
 <?php
-$host = "localhost";  // Ubah jika hosting berbeda
-$user = "root";       // Default XAMPP
-$pass = "";           // Kosongkan jika pakai XAMPP
-$dbname = "phanes_db";
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "phanes";
 
-$conn = new mysqli($host, $user, $pass, $dbname);
+// Koneksi ke MySQL
+$conn = mysqli_connect($host, $user, $pass, $db);
 
 // Cek koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+if (!$conn) {
+    die("Koneksi gagal: " . mysqli_connect_error());
 }
 ?>

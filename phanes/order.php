@@ -1,133 +1,156 @@
-<?php 
-require 'header.php'; 
-require 'config.php';
+<?php
+session_start();
+include 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama = $_POST['nama'];
-    $email = $_POST['email'];
-    $nomor_hp = $_POST['nomor_hp'];
-    $detail_pesanan = $_POST['detail_pesanan'];
+    // Ambil data dari form
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $figure_type = mysqli_real_escape_string($conn, $_POST['figure_type']);
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-    $sql = "INSERT INTO orders (nama, email, nomor_hp, detail_pesanan) 
-            VALUES ('$nama', '$email', '$nomor_hp', '$detail_pesanan')";
-    
-    if ($conn->query($sql) === TRUE) {
-        echo "<p class='success-message'>✅ Pesanan berhasil dikirim!</p>";
+    // Handle file upload
+    $imageName = "";
+    if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+        $uploadDir = "uploads/";
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $imageName = time() . '_' . basename($_FILES['file']['name']);
+        $uploadFile = $uploadDir . $imageName;
+        move_uploaded_file($_FILES['file']['tmp_name'], $uploadFile);
+    }
+
+    // Simpan ke database
+    $query = "INSERT INTO orders (user_id, name, email, figure_type, description, image) 
+              VALUES ('$user_id', '$name', '$email', '$figure_type', '$description', '$imageName')";
+
+    if (mysqli_query($conn, $query)) {
+        echo "<script>alert('Order berhasil dikirim!'); window.location='my_orders.php';</script>";
+        exit();
     } else {
-        echo "<p class='error-message'>❌ Terjadi kesalahan: " . $conn->error . "</p>";
+        echo "<script>alert('Gagal mengirim order!');</script>";
     }
 }
-
-$conn->close();
 ?>
 
-<style>
-    .container {
-    padding: 20px;
-    text-align: center;
-}
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Phanes - Order</title>
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
-        margin: 0;
-        padding: 0;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9fafe;
+      color: #333;
     }
 
-    .order {
-        max-width: 600px;
-        margin: 50px auto;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    .header {
+      background-color: #3b82f6;
+      color: white;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .order h2 {
-        text-align: center;
-        color: #4A90E2;
-        margin-bottom: 20px;
+    .header a {
+      color: white;
+      text-decoration: none;
+      margin-left: 30px;
+      font-weight: bold;
     }
 
-    .order form {
-        display: flex;
-        flex-direction: column;
+    .container {
+      max-width: 700px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .order input, 
-    .order textarea {
-        margin-bottom: 15px;
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
+    h2 {
+      text-align: center;
+      color: #3b82f6;
     }
 
-    .order textarea {
-        height: 100px;
-        resize: none;
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 600;
     }
 
-    .order button {
-        padding: 12px;
-        background: #4A90E2;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: 0.3s;
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1em;
     }
 
-    .order button:hover {
-        background: #357ABD;
+    button {
+      margin-top: 30px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      background-color: #3b82f6;
+      color: white;
+      font-size: 1.1em;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
     }
 
-    .success-message, .error-message {
-        text-align: center;
-        font-size: 14px;
-        padding: 10px;
-        margin-bottom: 15px;
-        border-radius: 5px;
+    button:hover {
+      background-color: #2563eb;
     }
+  </style>
+</head>
+<body>
 
-    .success-message {
-        color: #155724;
-        background-color: #d4edda;
-        border: 1px solid #c3e6cb;
-    }
+  <div class="header">
+    <h1>Phanes</h1>
+    <div>
+      <a href="index.php">Home</a>
+      <a href="services.php">Services</a>
+      <a href="contact.php">Contact</a>
+    </div>
+  </div>
 
-    .error-message {
-        color: #721c24;
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-    }
+  <div class="container">
+    <h2>Order Custom 3D Figure</h2>
+    <form action="#" method="post" enctype="multipart/form-data">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" required>
 
-    .back-home {
-        display: block;
-        text-align: center;
-        margin-top: 20px;
-        font-size: 16px;
-        color: #4A90E2;
-        text-decoration: none;
-    }
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required>
 
-    .back-home:hover {
-        text-decoration: underline;
-    }
-</style>
+      <label for="figure_type">Type of Figure</label>
+      <select id="figure_type" name="figure_type" required>
+        <option value="">-- Choose One --</option>
+        <option value="anime">Anime Style</option>
+        <option value="realistic">Realistic</option>
+        <option value="chibi">Chibi</option>
+        <option value="pet">Pet Figurine</option>
+        <option value="other">Other</option>
+      </select>
 
-<section class="order">
-    <h2>Form Pemesanan</h2>
-    <form method="POST">
-        <input type="text" name="nama" placeholder="Nama Lengkap" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="text" name="nomor_hp" placeholder="Nomor HP" required>
-        <textarea name="detail_pesanan" placeholder="Deskripsi Pesanan" required></textarea>
-        <button type="submit">Kirim Pesanan</button>
+      <label for="description">Order Description</label>
+      <textarea id="description" name="description" rows="6" placeholder="Describe your figure..." required></textarea>
+
+      <label for="file">Upload Design/Image (optional)</label>
+      <input type="file" id="file" name="file">
+
+      <button type="submit">Submit Order</button>
     </form>
-</section>
+  </div>
 
-<a href="index.php" class="back-home">⬅ Kembali ke Home</a>
-
-<?php require 'footer.php'; ?>
+</body>
+</html>
