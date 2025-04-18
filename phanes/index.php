@@ -18,15 +18,15 @@
       overflow: hidden;
     }
 
-    /* Sidebar kiri */
     .sidebar {
       width: 35%;
-      background-color: #ffffff;
+      background-color: rgb(15, 150, 228);
       padding: 40px 30px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
+      color: white;
     }
 
     .logo-area {
@@ -35,7 +35,7 @@
       gap: 10px;
       font-weight: bold;
       font-size: 1.5em;
-      color: #3b82f6;
+      color: #fff;
     }
 
     .promo {
@@ -45,21 +45,22 @@
     .promo h1 {
       font-size: 2.5em;
       letter-spacing: 2px;
+      color: #000;
     }
 
     .promo h1 span {
-      color: #3b82f6;
+      color: #7b61ff;
     }
 
     .promo p {
       margin: 20px 0;
-      color: #555;
+      color: #333;
       line-height: 1.6em;
     }
 
     .promo button {
       padding: 10px 20px;
-      background-color: #3b82f6;
+      background-color: rgb(192, 191, 191);
       border: none;
       border-radius: 25px;
       color: white;
@@ -69,7 +70,7 @@
     }
 
     .promo button:hover {
-      background-color: #2563eb;
+      background-color: rgb(36, 103, 248);
     }
 
     .social-icons {
@@ -84,13 +85,12 @@
       cursor: pointer;
     }
 
-    /* Main Content */
     .main {
       width: 65%;
-      background-image: url('https://cdn.pixabay.com/photo/2017/09/29/21/45/ulun-danu-2794774_960_720.jpg');
+      position: relative;
       background-size: cover;
       background-position: center;
-      position: relative;
+      transition: background-image 1s ease-in-out;
     }
 
     .navbar {
@@ -100,10 +100,11 @@
       display: flex;
       align-items: center;
       gap: 30px;
+      z-index: 2;
     }
 
     .navbar a {
-      color: white;
+      color: blue;
       text-decoration: none;
       font-weight: bold;
       transition: color 0.3s;
@@ -115,8 +116,8 @@
 
     .navbar button {
       padding: 8px 16px;
-      background-color: white;
-      color: #3b82f6;
+      background-color: blue;
+      color: #fff;
       border: none;
       border-radius: 20px;
       font-weight: bold;
@@ -126,14 +127,14 @@
 
     .navbar button:hover {
       background-color: #e0e7ff;
+      color: blue;
     }
 
-    /* Slider arrows */
     .arrow {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background-color: rgba(255, 255, 255, 0.6);
+      background-color: rgba(149, 215, 241, 0.6);
       border-radius: 50%;
       width: 40px;
       height: 40px;
@@ -141,6 +142,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      z-index: 2;
     }
 
     .arrow.left {
@@ -162,6 +164,7 @@
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
+
   <!-- Sidebar Kiri -->
   <div class="sidebar">
     <div>
@@ -174,28 +177,56 @@
         <h1>Discover <span>Phanes</span></h1>
         <p>Experience the future of 3D printing. Customize your dream into reality with our precision-crafted technology.</p>
         <a href="services.php"><button>Read More</button></a>
-
       </div>
-    </div>
-
-    <div class="social-icons">
-      <i class="fab fa-facebook-f"></i>
-      <i class="fab fa-instagram"></i>
-      <i class="fab fa-twitter"></i>
     </div>
   </div>
 
-  <!-- Main Section -->
-  <div class="navbar">
-  <a href="index.php">Home</a>
-  <a href="services.php">Services</a>
-  <a href="contact.php">Contact</a>
-  <a href="login.php"><button>Log In</button></a>
-</div>
+  <!-- Bagian Main -->
+  <div class="main">
+    <!-- Navbar -->
+    <div class="navbar">
+      <a href="index.php">Home</a>
+      <a href="services.php">Services</a>
+      <a href="contact.php">Contact</a>
+      <a href="login.php"><button>Log In</button></a>
+    </div>
 
-
+    <!-- Slider Arrows -->
     <div class="arrow left"><i class="fas fa-chevron-left"></i></div>
     <div class="arrow right"><i class="fas fa-chevron-right"></i></div>
   </div>
+
+  <script>
+    const images = [
+      'https://i.pinimg.com/236x/60/de/83/60de832fcdeab6ec3a7eded588507cb9.jpg',
+      'https://cdn.pixabay.com/photo/2021/01/11/08/07/bromo-5905724_960_720.jpg',
+      'https://cdn.pixabay.com/photo/2017/05/31/17/44/bali-2369307_960_720.jpg'
+    ];
+
+    let index = 0;
+    const main = document.querySelector('.main');
+
+    function updateImage() {
+      main.style.backgroundImage = `url('${images[index]}')`;
+    }
+
+    updateImage();
+
+    document.querySelector('.arrow.right').addEventListener('click', () => {
+      index = (index + 1) % images.length;
+      updateImage();
+    });
+
+    document.querySelector('.arrow.left').addEventListener('click', () => {
+      index = (index - 1 + images.length) % images.length;
+      updateImage();
+    });
+
+    setInterval(() => {
+      index = (index + 1) % images.length;
+      updateImage();
+    }, 5000);
+  </script>
+
 </body>
 </html>
